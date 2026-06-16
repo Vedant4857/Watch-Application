@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Uest</string>
+    <string name="principal_dashboard">Principal Dashboard</string>
+    <string name="staff_attendance">Staff Attendance</string>
+    <string name="student_attendance">Student Attendance</string>
+    <string name="fees_collected">Fees Collected</string>
+    <string name="new_admissions">New Admissions</string>
+    <string name="today">Today</string>
+    <string name="present">Present</string>
+    <string name="absent">Absent</string>
+    <string name="back_to_dashboard">Back to Dashboard</string>
+    <string name="loading">Loading…</string>
+    <string name="retry">Retry</string>
+    <string name="tap_for_details">Tap card for details</string>
+    <string name="transactions">Transactions</string>
+    <string name="overall_attendance">Overall Attendance</string>
+    <string name="class_wise">Class-wise Breakdown</string>
+    <string name="parent">Parent</string>
+    <string name="admission_number">Admission No.</string>
+</resources>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="deep_navy">#0A0E27</color>
+    <color name="electric_blue">#3D6EFF</color>
+    <color name="cyan_accent">#00C9FF</color>
+    <color name="teal_green">#00E5A0</color>
+    <color name="golden_yellow">#FFBB00</color>
+    <color name="coral_red">#FF5C7A</color>
+    <color name="purple_accent">#B06EFF</color>
+    <color name="soft_white">#ECF0FF</color>
+    <color name="dark_card">#0F1535</color>
+</resources>

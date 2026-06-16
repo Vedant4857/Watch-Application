@@ -1,0 +1,7 @@
+app/google-services.json
+backend/.env
+backend/storage/firebase/firebase-service-account.json
+app/build/
+backend/vendor/
+.gradle/
+.idea/
