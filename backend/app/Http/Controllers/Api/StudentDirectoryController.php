@@ -18,8 +18,8 @@ class StudentDirectoryController extends Controller
             ->orderBy('name')
             ->get([
                 'name',
-                'contact_number',
                 'class_name',
+                'contact_number',
                 'photo',
             ])
             ->map(function ($student) {
@@ -27,7 +27,7 @@ class StudentDirectoryController extends Controller
                     'name'          => $student->name ?: 'Unknown Student',
                     'className'     => $student->class_name ?: 'N/A',
                     'contactNumber' => $student->contact_number ?: 'N/A',
-                    'photo'         => $student->photo ? request()->getSchemeAndHttpHost() . '/storage/' . ltrim($student->photo, '/') : '',
+                    'photo'         => $student->photo ? asset('storage/' . $student->photo) : '',
                 ];
             });
 

@@ -58,4 +58,6 @@ interface SchoolDataProvider
     public function updateStaffLeaveStatus(int $id, string $status): void;
 
     public function updateStudentLeaveStatus(int $id, string $status): void;
+
+    public function getUpcomingEvents(): array;
 }

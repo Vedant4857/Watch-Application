@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.google.services)
 }
 
@@ -49,6 +50,7 @@ dependencies {
     implementation(composeBom)
 
     implementation(libs.firebase.messaging)
+    implementation(libs.kotlinx.serialization.json)
     implementation(libs.coil.compose)
 
     implementation(libs.androidx.activity.compose)

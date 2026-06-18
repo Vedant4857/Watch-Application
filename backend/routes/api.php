@@ -9,6 +9,9 @@ use App\Http\Controllers\Api\StudentDirectoryController;
 use App\Http\Controllers\Api\StaffDirectoryController;
 use App\Http\Controllers\Api\DeviceTokenController;
 use App\Http\Controllers\Api\LeavesController;
+use App\Http\Controllers\Api\EventController;
+use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\ExpenseController;
 use App\Services\FirebaseNotificationService;
 use Illuminate\Support\Facades\Route;
 
@@ -41,6 +44,12 @@ Route::prefix('v1')->group(function () {
     Route::get('/leaves/students', [LeavesController::class, 'getStudentLeaves']);
     Route::post('/leaves/staff/{id}/status', [LeavesController::class, 'updateStaffLeaveStatus']);
     Route::post('/leaves/students/{id}/status', [LeavesController::class, 'updateStudentLeaveStatus']);
+
+    Route::get('/events/upcoming', [EventController::class, 'index']);
+    Route::get('/notifications', [NotificationController::class, 'index']);
+
+    Route::get('/expenses', [ExpenseController::class, 'index']);
+    Route::post('/expenses/{id}/status', [ExpenseController::class, 'updateStatus']);
 
     Route::post('/device-token',[DeviceTokenController::class, 'store']);
     Route::get('/test-notification', function (FirebaseNotificationService $firebase) {

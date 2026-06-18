@@ -63,6 +63,27 @@ class DatabaseSchoolDataProvider implements SchoolDataProvider
         $studentsPresent = (int) ($studentsPresent ?? 0);
         $totalStudents = (int) ($totalStudents ?? 0);
 
+        $today = Carbon::today(config('school.timezone'))->toDateString();
+
+        $unreadNotificationCount = DB::table('notifications')
+            ->where('school_id', $schoolId)
+            ->where('is_read', false)
+            ->count();
+
+        $startOfMonth = Carbon::now(config('school.timezone'))->startOfMonth()->toDateString();
+        $endOfMonth = Carbon::now(config('school.timezone'))->endOfMonth()->toDateString();
+
+        $totalSpendings = DB::table('expenses')
+            ->where('school_id', $schoolId)
+            ->where('status', 'APPROVED')
+            ->whereBetween('date_incurred', [$startOfMonth, $endOfMonth])
+            ->sum('amount');
+
+        $pendingSpendingsCount = DB::table('expenses')
+            ->where('school_id', $schoolId)
+            ->where('status', 'PENDING')
+            ->count();
+
         return [
             'date' => $this->formatDisplayDate($date),
             'principalName' => $this->getPrincipalName($schoolId),
@@ -75,6 +96,9 @@ class DatabaseSchoolDataProvider implements SchoolDataProvider
             'feesCollected' => (float) ($feeStats->total_amount ?? 0),
             'feeTransactionCount' => (int) ($feeStats->transaction_count ?? 0),
             'newAdmissions' => $newAdmissions,
+            'unreadNotificationCount' => $unreadNotificationCount,
+            'totalSpendings' => (float) $totalSpendings,
+            'pendingSpendingsCount' => $pendingSpendingsCount,
         ];
     }
 
@@ -291,5 +315,31 @@ class DatabaseSchoolDataProvider implements SchoolDataProvider
         StudentLeave::where('school_id', $schoolId)
             ->where('id', $id)
             ->update(['status' => $status]);
+    }
+
+    public function getUpcomingEvents(): array
+    {
+        $today = Carbon::today(config('school.timezone'))->toDateString();
+        $thirtyDaysFromNow = Carbon::today(config('school.timezone'))->addDays(30)->toDateString();
+
+        return DB::table('events')
+            ->where('event_date', '>=', $today)
+            ->where('event_date', '<=', $thirtyDaysFromNow)
+            ->orderBy('event_date', 'asc')
+            ->orderBy('start_time', 'asc')
+            ->get()
+            ->map(fn ($event) => [
+                'id' => $event->id,
+                'title' => $event->title,
+                'description' => $event->description,
+                'date' => Carbon::parse($event->event_date)->format('Y-m-d'),
+                'startTime' => $event->start_time ? Carbon::parse($event->start_time)->format('H:i') : null,
+                'endTime' => $event->end_time ? Carbon::parse($event->end_time)->format('H:i') : null,
+                'venue' => $event->venue,
+                'category' => $event->category,
+                'audience' => $event->audience,
+                'isRecurring' => (bool) $event->is_recurring,
+            ])
+            ->toArray();
     }
 }

@@ -186,4 +186,48 @@ class MockSchoolDataProvider implements SchoolDataProvider
     {
         // Mock no-op
     }
+
+    public function getUpcomingEvents(): array
+    {
+        $today = Carbon::today(config('school.timezone'));
+        
+        return [
+            [
+                'id' => 1,
+                'title' => 'Annual Science Fair',
+                'description' => 'Students will showcase their science projects.',
+                'date' => $today->copy()->addDays(5)->format('Y-m-d'),
+                'startTime' => '09:00',
+                'endTime' => '14:00',
+                'venue' => 'Main Hall',
+                'category' => 'ACADEMIC',
+                'audience' => 'ALL',
+                'isRecurring' => false,
+            ],
+            [
+                'id' => 2,
+                'title' => 'Staff Meeting',
+                'description' => 'Monthly staff alignment meeting.',
+                'date' => $today->copy()->addDays(12)->format('Y-m-d'),
+                'startTime' => '15:00',
+                'endTime' => '16:30',
+                'venue' => 'Staff Room 1',
+                'category' => 'STAFF',
+                'audience' => 'STAFF',
+                'isRecurring' => true,
+            ],
+            [
+                'id' => 3,
+                'title' => 'Summer Break Starts',
+                'description' => 'School closed for summer holidays.',
+                'date' => $today->copy()->addDays(20)->format('Y-m-d'),
+                'startTime' => null,
+                'endTime' => null,
+                'venue' => null,
+                'category' => 'HOLIDAY',
+                'audience' => 'ALL',
+                'isRecurring' => false,
+            ]
+        ];
+    }
 }

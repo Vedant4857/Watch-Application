@@ -34,6 +34,7 @@ import androidx.compose.animation.core.*
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -103,7 +104,9 @@ fun DashboardScreen(
     onNavigateToStaffList: () -> Unit,
     onNavigateToStudentList: () -> Unit,
     onNavigateToStaffLeaves: () -> Unit,
-    onNavigateToStudentLeaves: () -> Unit
+    onNavigateToStudentLeaves: () -> Unit,
+    onNavigateToEvents: () -> Unit,
+    onNavigateToNotifications: () -> Unit
 ) {
     // Fetch fresh data every time this screen enters the composition.
     LaunchedEffect(Unit) {
@@ -117,6 +120,7 @@ fun DashboardScreen(
 
     val pendingStaffLeaves = (staffLeavesState as? UiState.Success)?.data?.count { it.status == "pending" } ?: 0
     val pendingStudentLeaves = (studentLeavesState as? UiState.Success)?.data?.count { it.status == "pending" } ?: 0
+    val upcomingEventsCount = (viewModel.upcomingEvents.value as? UiState.Success)?.data?.size ?: 0
 
     // Route to the correct screen based on the current data-loading state.
     when (val state = statsState) {
@@ -147,7 +151,10 @@ fun DashboardScreen(
                 onNavigateToStaffList         = onNavigateToStaffList,
                 onNavigateToStudentList       = onNavigateToStudentList,
                 onNavigateToStaffLeaves       = onNavigateToStaffLeaves,
-                onNavigateToStudentLeaves     = onNavigateToStudentLeaves
+                onNavigateToStudentLeaves     = onNavigateToStudentLeaves,
+                onNavigateToEvents            = onNavigateToEvents,
+                onNavigateToNotifications     = onNavigateToNotifications,
+                upcomingEventsCount           = upcomingEventsCount
             )
         }
     }
@@ -185,7 +192,10 @@ private fun DashboardContent(
     onNavigateToStaffList: () -> Unit,
     onNavigateToStudentList: () -> Unit,
     onNavigateToStaffLeaves: () -> Unit,
-    onNavigateToStudentLeaves: () -> Unit
+    onNavigateToStudentLeaves: () -> Unit,
+    onNavigateToEvents: () -> Unit,
+    onNavigateToNotifications: () -> Unit,
+    upcomingEventsCount: Int
 ) {
     // Hoisted scroll state so the Scaffold's PositionIndicator can read it.
     val scalingLazyListState = rememberScalingLazyListState()
@@ -229,8 +239,13 @@ private fun DashboardContent(
 
             // ── 1. Header ────────────────────────────────────────────────────
             item {
-                DashboardHeader(stats = stats)
+                DashboardHeader(
+                    stats = stats,
+                    onNavigateToNotifications = onNavigateToNotifications
+                )
             }
+
+
 
             item {
                 MetricCard(
@@ -342,7 +357,20 @@ private fun DashboardContent(
                 )
             }
 
-            // ── 10. Footer hint ───────────────────────────────────────────────
+            // ── 10. Upcoming Events ─────────────────────────────────────────────
+            item {
+                MetricCard(
+                    icon        = "📅",
+                    label       = "Upcoming Events",
+                    value       = if (upcomingEventsCount > 0) "$upcomingEventsCount Events" else "No Events",
+                    subValue    = "Next 30 Days",
+                    accentColor = CyanAccent,
+                    percentage  = null,
+                    onClick     = onNavigateToEvents
+                )
+            }
+
+            // ── 11. Footer hint ───────────────────────────────────────────────
             item {
                 Text(
                     text      = "Tap specific card for details",
@@ -367,34 +395,80 @@ private fun DashboardContent(
  *  - Today's date in muted grey.
  */
 @Composable
-private fun DashboardHeader(stats: DashboardStats) {
+private fun DashboardHeader(
+    stats: DashboardStats,
+    onNavigateToNotifications: () -> Unit
+) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier            = Modifier.fillMaxWidth()
+        modifier            = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 6.dp)
     ) {
-        // Role label — amber colour signals context / authority at a glance.
-        Text(
-            text       = "🏫 Principal",
-            color      = Color(0xFFFBBF24),
-            fontSize   = 11.sp,
-            fontWeight = FontWeight.SemiBold
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .clip(RoundedCornerShape(12.dp))
+                .background(Color(0xFF332D1D))
+                .padding(horizontal = 8.dp, vertical = 2.dp)
+        ) {
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(
+                text       = "PRINCIPAL",
+                color      = Color(0xFFFBBF24),
+                fontSize   = 8.sp,
+                fontWeight = FontWeight.ExtraBold,
+                letterSpacing = 1.sp
+            )
+        }
 
-        // Principal's name — truncated so it never wraps onto a second line.
-        Text(
-            text       = stats.principalName,
-            color      = Color(0xFFF8FAFC),
-            fontSize   = 13.sp,
-            fontWeight = FontWeight.Bold,
-            maxLines   = 1,
-            overflow   = TextOverflow.Ellipsis
-        )
+        Spacer(modifier = Modifier.height(4.dp))
 
-        // Today's date string, e.g. "Mon, 15 Jun 2026".
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text       = stats.principalName,
+                color      = Color.White,
+                fontSize   = 14.sp,
+                fontWeight = FontWeight.Bold,
+                maxLines   = 1,
+                overflow   = TextOverflow.Ellipsis
+            )
+            
+            Spacer(modifier = Modifier.width(6.dp))
+            
+            Box(
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .background(Color(0xFF2D3748))
+                    .clickable(onClick = onNavigateToNotifications)
+                    .padding(4.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = "🔔", fontSize = 12.sp)
+                if (stats.unreadNotificationCount > 0) {
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .offset(x = 2.dp, y = (-2).dp)
+                            .size(6.dp)
+                            .clip(CircleShape)
+                            .background(CoralRed)
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(2.dp))
+
         Text(
             text     = stats.date,
-            color    = MutedGray,
-            fontSize = 10.sp
+            color    = Color(0xFF94A3B8),
+            fontSize = 9.sp,
+            fontWeight = FontWeight.Medium
         )
     }
 }

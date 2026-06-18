@@ -54,4 +54,9 @@ class SchoolDataService
     {
         $this->provider->updateStudentLeaveStatus($id, $status);
     }
+
+    public function getUpcomingEvents(): array
+    {
+        return $this->provider->getUpcomingEvents();
+    }
 }

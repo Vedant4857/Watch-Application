@@ -15,6 +15,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import com.school.erp.watch.domain.model.Event
 
 private const val TAG = "SchoolDataRepository"
 
@@ -60,6 +61,17 @@ data class StudentLeave(
     val status: String
 )
 
+data class Notification(
+    val id: Int,
+    val title: String,
+    val message: String,
+    val type: String,
+    val isRead: Boolean,
+    val createdAt: String
+)
+
+
+
 data class DashboardStats(
     val date: String,
     val staffPresent: Int,
@@ -71,7 +83,8 @@ data class DashboardStats(
     val feesCollected: Double,
     val feeTransactionCount: Int,
     val newAdmissions: Int,
-    val principalName: String = "Vedant Shekhar"
+    val principalName: String = "Vedant Shekhar",
+    val unreadNotificationCount: Int = 0
 )
 
 data class StaffAttendanceData(
@@ -162,6 +175,16 @@ class SchoolDataRepository {
     fun getStudentLeaves(): Flow<List<StudentLeave>> = flow {
         emit(fetchDataArray("/leaves/students").toStudentLeaves())
     }.flowOn(Dispatchers.IO)
+
+    fun getUpcomingEvents(): Flow<List<Event>> = flow {
+        emit(fetchDataArray("/events/upcoming").toEvents())
+    }.flowOn(Dispatchers.IO)
+
+    fun getNotifications(): Flow<List<Notification>> = flow {
+        emit(fetchDataArray("/notifications").toNotifications())
+    }.flowOn(Dispatchers.IO)
+
+
 
     suspend fun updateStaffLeaveStatus(id: Int, newStatus: String) = withContext(Dispatchers.IO) {
         val connection = (URL("$API_BASE_URL/leaves/staff/$id/status").openConnection() as HttpURLConnection).apply {
@@ -264,7 +287,8 @@ class SchoolDataRepository {
             feesCollected = optDouble("feesCollected", 0.0),
             feeTransactionCount = optInt("feeTransactionCount", 0),
             newAdmissions = optInt("newAdmissions", 0),
-            principalName = optString("principalName", "Vedant Shekhar")
+            principalName = optString("principalName", "Vedant Shekhar"),
+            unreadNotificationCount = optInt("unreadNotificationCount", 0)
         )
     }
 
@@ -376,6 +400,36 @@ class SchoolDataRepository {
                 leaveType = item.optString("leaveType"),
                 reason = item.optString("reason"),
                 status = item.optString("status")
+            )
+        }
+    }
+
+    private fun JSONArray.toEvents(): List<Event> {
+        return mapObjects { item ->
+            Event(
+                id = item.optLong("id"),
+                title = item.optString("title"),
+                description = item.optString("description", null).takeIf { it.isNotEmpty() && it != "null" },
+                date = item.optString("date"),
+                startTime = item.optString("startTime", null).takeIf { it.isNotEmpty() && it != "null" },
+                endTime = item.optString("endTime", null).takeIf { it.isNotEmpty() && it != "null" },
+                venue = item.optString("venue", null).takeIf { it.isNotEmpty() && it != "null" },
+                category = item.optString("category"),
+                audience = item.optString("audience"),
+                isRecurring = item.optBoolean("isRecurring")
+            )
+        }
+    }
+
+    private fun JSONArray.toNotifications(): List<Notification> {
+        return mapObjects { item ->
+            Notification(
+                id = item.optInt("id"),
+                title = item.optString("title"),
+                message = item.optString("message"),
+                type = item.optString("type"),
+                isRead = item.optBoolean("isRead", false),
+                createdAt = item.optString("createdAt")
             )
         }
     }

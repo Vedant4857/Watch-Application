@@ -12,6 +12,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.wear.compose.navigation.SwipeDismissableNavHost
 import androidx.wear.compose.navigation.composable
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
+import com.school.erp.watch.presentation.screens.EventsScreen
+import com.school.erp.watch.presentation.screens.NotificationsScreen
 import com.school.erp.watch.presentation.screens.*
 import com.school.erp.watch.presentation.theme.SchoolERPWatchTheme
 import com.school.erp.watch.viewmodel.DashboardViewModel
@@ -30,6 +32,8 @@ object Routes {
     const val STUDENT_LIST       = "student_list"
     const val STAFF_LEAVES       = "staff_leaves"
     const val STUDENT_LEAVES     = "student_leaves"
+    const val EVENTS             = "events"
+    const val NOTIFICATIONS      = "notifications"
 }
 
 class MainActivity : ComponentActivity() {
@@ -65,7 +69,9 @@ class MainActivity : ComponentActivity() {
                             onNavigateToStaffList         = { navController.navigate(Routes.STAFF_LIST) },
                             onNavigateToStudentList       = { navController.navigate(Routes.STUDENT_LIST) },
                             onNavigateToStaffLeaves       = { navController.navigate(Routes.STAFF_LEAVES) },
-                            onNavigateToStudentLeaves     = { navController.navigate(Routes.STUDENT_LEAVES) }
+                            onNavigateToStudentLeaves     = { navController.navigate(Routes.STUDENT_LEAVES) },
+                            onNavigateToEvents            = { navController.navigate(Routes.EVENTS) },
+                            onNavigateToNotifications     = { navController.navigate(Routes.NOTIFICATIONS) }
                         )
                     }
 
@@ -120,6 +126,19 @@ class MainActivity : ComponentActivity() {
 
                     composable(Routes.STUDENT_LEAVES) {
                         StudentLeavesScreen(
+                            viewModel = viewModel,
+                            onBack = { navController.popBackStack() }
+                        )
+                    }
+
+                    composable(Routes.EVENTS) {
+                        EventsScreen(
+                            viewModel = viewModel,
+                            onBack = { navController.popBackStack() }
+                        )
+                    }
+                    composable(Routes.NOTIFICATIONS) {
+                        NotificationsScreen(
                             viewModel = viewModel,
                             onBack = { navController.popBackStack() }
                         )

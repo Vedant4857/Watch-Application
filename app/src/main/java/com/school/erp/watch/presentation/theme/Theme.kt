@@ -22,6 +22,7 @@ val CardBorder     = Color(0xFF1E2D5A)
 val Black = Color(0xFF000000)
 
 val grey = Color(0xFF202124)
+val DarkGrey = Color(0xFF202124)
 
 val MoneyGreen = Color(0xFF4CAF50)
 

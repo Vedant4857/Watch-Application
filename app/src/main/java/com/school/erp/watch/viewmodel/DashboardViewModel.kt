@@ -3,6 +3,7 @@ package com.school.erp.watch.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.school.erp.watch.data.*
+import com.school.erp.watch.domain.model.Event
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -43,6 +44,12 @@ class DashboardViewModel : ViewModel() {
     private val _studentLeaves = MutableStateFlow<UiState<List<StudentLeave>>>(UiState.Loading)
     val studentLeaves: StateFlow<UiState<List<StudentLeave>>> = _studentLeaves.asStateFlow()
 
+    private val _notifications = MutableStateFlow<UiState<List<Notification>>>(UiState.Loading)
+    val notifications: StateFlow<UiState<List<Notification>>> = _notifications.asStateFlow()
+
+    private val _upcomingEvents = MutableStateFlow<UiState<List<Event>>>(UiState.Loading)
+    val upcomingEvents: StateFlow<UiState<List<Event>>> = _upcomingEvents.asStateFlow()
+
     init {
         loadAllData()
     }
@@ -57,6 +64,7 @@ class DashboardViewModel : ViewModel() {
         loadStudentList()
         loadStaffLeaves()
         loadStudentLeaves()
+        loadUpcomingEvents()
     }
 
     private fun loadDashboard() {
@@ -140,6 +148,20 @@ class DashboardViewModel : ViewModel() {
         }
     }
 
+    private fun loadUpcomingEvents() {
+        viewModelScope.launch {
+            _upcomingEvents.value = UiState.Loading
+            repository.getUpcomingEvents()
+                .catch { e -> _upcomingEvents.value = UiState.Error(e.message ?: "Error") }
+                .collect { _upcomingEvents.value = UiState.Success(it) }
+        }
+        viewModelScope.launch {
+            repository.getNotifications()
+                .catch { e -> _notifications.value = UiState.Error(e.message ?: "Error") }
+                .collect { _notifications.value = UiState.Success(it) }
+        }
+    }
+
     fun handleStaffLeaveStatus(id: Int, status: String) {
         viewModelScope.launch {
             try {
@@ -155,9 +177,9 @@ class DashboardViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 repository.updateStudentLeaveStatus(id, status)
-                loadStudentLeaves() // Refresh list
+                refresh()
             } catch (e: Exception) {
-                // Log error
+                // Ignore for now
             }
         }
     }

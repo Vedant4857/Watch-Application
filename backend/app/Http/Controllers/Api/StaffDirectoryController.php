@@ -18,19 +18,19 @@ class StaffDirectoryController extends Controller
             ->get([
                 'name',
                 'department',
+                'role',
                 'contact_number',
                 'email',
-                'role',
                 'photo',
             ])
             ->map(function ($row) {
                 return [
                     'name'          => $row->name ?: 'Unknown Staff',
                     'department'    => $row->department ?: 'N/A',
+                    'role'          => $row->role ?: 'N/A',
                     'contactNumber' => $row->contact_number ?: 'N/A',
                     'email'         => $row->email ?: 'N/A',
-                    'role'          => $row->role ?: 'N/A',
-                    'photoUrl'      => $row->photo ? request()->getSchemeAndHttpHost() . '/storage/' . ltrim($row->photo, '/') : '',
+                    'photoUrl'      => $row->photo ? asset('storage/' . $row->photo) : '',
                 ];
             });
 
