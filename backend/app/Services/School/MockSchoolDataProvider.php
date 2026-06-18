@@ -42,13 +42,13 @@ class MockSchoolDataProvider implements SchoolDataProvider
         ['studentName' => 'Anvi Nair', 'className' => 'Grade 1-B', 'amount' => 5000.0, 'time' => '1:20 PM', 'type' => 'Tuition'],
     ];
 
-    /** @var list<array{studentName: string, className: string, admissionNumber: string, time: string, parentName: string}> */
+    /** @var list<array{studentName: string, className: string, enrollmentNo: string, time: string, parentName: string}> */
     private array $admissions = [
-        ['studentName' => 'Tanisha Bose', 'className' => 'Grade 6-A', 'admissionNumber' => 'ADM-2024-1089', 'time' => '8:45 AM', 'parentName' => 'Mr. Subroto Bose'],
-        ['studentName' => 'Kiran Reddy', 'className' => 'Grade 4-B', 'admissionNumber' => 'ADM-2024-1090', 'time' => '9:30 AM', 'parentName' => 'Mrs. Lakshmi Reddy'],
-        ['studentName' => 'Arjun Mishra', 'className' => 'Grade 9-A', 'admissionNumber' => 'ADM-2024-1091', 'time' => '10:20 AM', 'parentName' => 'Mr. Arun Mishra'],
-        ['studentName' => 'Diya Malhotra', 'className' => 'Grade 2-A', 'admissionNumber' => 'ADM-2024-1092', 'time' => '11:10 AM', 'parentName' => 'Mrs. Rekha Malhotra'],
-        ['studentName' => 'Siddharth Roy', 'className' => 'Grade 11-B', 'admissionNumber' => 'ADM-2024-1093', 'time' => '12:05 PM', 'parentName' => 'Mr. Bijoy Roy'],
+        ['studentName' => 'Tanisha Bose', 'className' => 'Grade 6-A', 'enrollmentNo' => 'ADM-2024-1089', 'time' => '8:45 AM', 'parentName' => 'Mr. Subroto Bose'],
+        ['studentName' => 'Kiran Reddy', 'className' => 'Grade 4-B', 'enrollmentNo' => 'ADM-2024-1090', 'time' => '9:30 AM', 'parentName' => 'Mrs. Lakshmi Reddy'],
+        ['studentName' => 'Arjun Mishra', 'className' => 'Grade 9-A', 'enrollmentNo' => 'ADM-2024-1091', 'time' => '10:20 AM', 'parentName' => 'Mr. Arun Mishra'],
+        ['studentName' => 'Diya Malhotra', 'className' => 'Grade 2-A', 'enrollmentNo' => 'ADM-2024-1092', 'time' => '11:10 AM', 'parentName' => 'Mrs. Rekha Malhotra'],
+        ['studentName' => 'Siddharth Roy', 'className' => 'Grade 11-B', 'enrollmentNo' => 'ADM-2024-1093', 'time' => '12:05 PM', 'parentName' => 'Mr. Bijoy Roy'],
     ];
 
     /** @var list<array{className: string, present: int, total: int}> */
@@ -138,5 +138,52 @@ class MockSchoolDataProvider implements SchoolDataProvider
             : Carbon::now(config('school.timezone'));
 
         return $carbon->format('d M Y');
+    }
+
+    public function getStaffLeaves(): array
+    {
+        return [
+            [
+                'id' => 1,
+                'staffName' => 'Amit Verma',
+                'leaveDate' => '2026-06-18',
+                'leaveType' => 'Sick Leave',
+                'reason' => 'Fever and cold',
+                'status' => 'pending',
+            ],
+            [
+                'id' => 2,
+                'staffName' => 'Sunita Rao',
+                'leaveDate' => '2026-06-19',
+                'leaveType' => 'Personal Leave',
+                'reason' => 'Family function',
+                'status' => 'approved',
+            ]
+        ];
+    }
+
+    public function getStudentLeaves(): array
+    {
+        return [
+            [
+                'id' => 1,
+                'studentName' => 'Aryan Kapoor',
+                'className' => 'Grade 10-A',
+                'leaveDate' => '2026-06-18',
+                'leaveType' => 'Sick Leave',
+                'reason' => 'Doctor appointment',
+                'status' => 'pending',
+            ]
+        ];
+    }
+
+    public function updateStaffLeaveStatus(int $id, string $status): void
+    {
+        // Mock no-op
+    }
+
+    public function updateStudentLeaveStatus(int $id, string $status): void
+    {
+        // Mock no-op
     }
 }

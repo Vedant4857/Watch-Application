@@ -1,22 +1,32 @@
 package com.school.erp.watch.presentation.screens
 
+import android.Manifest
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.paging.LoadState
-import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.wear.compose.material.*
+import coil.compose.AsyncImage
 import com.school.erp.watch.data.StudentInfo
 import com.school.erp.watch.presentation.theme.*
 import com.school.erp.watch.viewmodel.DashboardViewModel
@@ -27,8 +37,23 @@ fun StudentListScreen(
     viewModel: DashboardViewModel,
     onBack: () -> Unit,
 ) {
-    val pagingItems = viewModel.studentList.collectAsLazyPagingItems()
+    val state by viewModel.studentList.collectAsStateWithLifecycle()
 
+    when (val s = state) {
+        is UiState.Loading -> LoadingScreen()
+        is UiState.Error   -> ErrorScreen(message = s.message) { viewModel.refresh() }
+        is UiState.Success -> StudentListContent(
+            studentList = s.data,
+            onBack      = onBack
+        )
+    }
+}
+
+@Composable
+private fun StudentListContent(
+    studentList: List<StudentInfo>,
+    onBack: () -> Unit,
+) {
     val listState = rememberScalingLazyListState()
 
     Scaffold(
@@ -69,27 +94,16 @@ fun StudentListScreen(
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "${studentList.size} students",
+                        color = MutedGray,
+                        fontSize = 10.sp
+                    )
                 }
             }
 
-            when (val loadState = pagingItems.loadState.refresh) {
-                is LoadState.Loading -> {
-                    item { LoadingScreen() }
-                }
-                is LoadState.Error -> {
-                    item {
-                        ErrorScreen(message = loadState.error.message ?: "Unknown error") {
-                            pagingItems.retry()
-                        }
-                    }
-                }
-                else -> {
-                    items(pagingItems.itemCount) { index ->
-                        pagingItems[index]?.let { student ->
-                            StudentDirectoryRow(info = student)
-                        }
-                    }
-                }
+            items(studentList.size) { index ->
+                StudentDirectoryRow(info = studentList[index])
             }
         }
     }
@@ -97,10 +111,35 @@ fun StudentListScreen(
 
 @Composable
 fun StudentDirectoryRow(info: StudentInfo) {
+    val context = LocalContext.current
+    var pendingNumber by remember { mutableStateOf("") }
+
+    val callPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted && pendingNumber.isNotEmpty()) {
+            placeStudentCall(context, pendingNumber)
+            pendingNumber = ""
+        }
+    }
+
+    fun onCallClick(number: String) {
+        val hasPermission = ContextCompat.checkSelfPermission(
+            context, Manifest.permission.CALL_PHONE
+        ) == PackageManager.PERMISSION_GRANTED
+
+        if (hasPermission) {
+            placeStudentCall(context, number)
+        } else {
+            pendingNumber = number
+            callPermissionLauncher.launch(Manifest.permission.CALL_PHONE)
+        }
+    }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(10.dp))
+            .clip(RoundedCornerShape(25.dp))
             .background(grey)
             .padding(horizontal = 10.dp, vertical = 7.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -112,12 +151,21 @@ fun StudentDirectoryRow(info: StudentInfo) {
                 .clip(CircleShape)
                 .background(GoldenYellow.copy(alpha = 0.2f))
         ) {
-            Text(
-                text = info.name.take(1).uppercase(),
-                color = GoldenYellow,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Bold
-            )
+            if (info.photoUrl.isNotEmpty()) {
+                AsyncImage(
+                    model = info.photoUrl,
+                    contentDescription = "Profile Photo",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize().clip(CircleShape)
+                )
+            } else {
+                Text(
+                    text = info.name.take(1).uppercase(),
+                    color = GoldenYellow,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
         }
 
         Spacer(modifier = Modifier.width(8.dp))
@@ -131,18 +179,45 @@ fun StudentDirectoryRow(info: StudentInfo) {
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = info.className,
+                color = MutedGray,
+                fontSize = 9.sp
+            )
+        }
+
+        // Direct call button
+        if (info.contactNumber.isNotEmpty()) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(32.dp)
+                    .clip(CircleShape)
+                    .background(Color(0xFF1DB954).copy(alpha = 0.4f))
+                    .clickable { onCallClick(info.contactNumber) }
+            ) {
                 Text(
-                    text = info.className,
-                    color = MutedGray,
-                    fontSize = 9.sp
-                )
-                Text(
-                    text = " • ${info.rollNumber}",
-                    color = MutedGray.copy(alpha = 0.7f),
-                    fontSize = 9.sp
+                    text = "📞",
+                    fontSize = 14.sp
                 )
             }
+        }
+    }
+}
+
+private fun placeStudentCall(context: Context, number: String) {
+    try {
+        val intent = Intent(Intent.ACTION_CALL, Uri.parse("tel:$number"))
+        context.startActivity(intent)
+    } catch (e: SecurityException) {
+        val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:$number"))
+        context.startActivity(intent)
+    } catch (e: Exception) {
+        try {
+            val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:$number"))
+            context.startActivity(intent)
+        } catch (ex: Exception) {
+            // Dialer not found
         }
     }
 }

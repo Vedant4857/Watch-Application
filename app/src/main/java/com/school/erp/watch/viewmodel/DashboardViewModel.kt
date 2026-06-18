@@ -2,8 +2,6 @@ package com.school.erp.watch.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
 import com.school.erp.watch.data.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -33,10 +31,17 @@ class DashboardViewModel : ViewModel() {
     private val _admissions = MutableStateFlow<UiState<List<AdmissionRecord>>>(UiState.Loading)
     val admissions: StateFlow<UiState<List<AdmissionRecord>>> = _admissions.asStateFlow()
 
-    private val _staffList = MutableStateFlow<UiState<List<AttendanceRecord>>>(UiState.Loading)
-    val staffList: StateFlow<UiState<List<AttendanceRecord>>> = _staffList.asStateFlow()
+    private val _staffList = MutableStateFlow<UiState<List<StaffInfo>>>(UiState.Loading)
+    val staffList: StateFlow<UiState<List<StaffInfo>>> = _staffList.asStateFlow()
 
-    val studentList: Flow<PagingData<StudentInfo>> = repository.getPagedStudentList().cachedIn(viewModelScope)
+    private val _studentList = MutableStateFlow<UiState<List<StudentInfo>>>(UiState.Loading)
+    val studentList: StateFlow<UiState<List<StudentInfo>>> = _studentList.asStateFlow()
+
+    private val _staffLeaves = MutableStateFlow<UiState<List<StaffLeave>>>(UiState.Loading)
+    val staffLeaves: StateFlow<UiState<List<StaffLeave>>> = _staffLeaves.asStateFlow()
+
+    private val _studentLeaves = MutableStateFlow<UiState<List<StudentLeave>>>(UiState.Loading)
+    val studentLeaves: StateFlow<UiState<List<StudentLeave>>> = _studentLeaves.asStateFlow()
 
     init {
         loadAllData()
@@ -49,6 +54,9 @@ class DashboardViewModel : ViewModel() {
         loadFees()
         loadAdmissions()
         loadStaffList()
+        loadStudentList()
+        loadStaffLeaves()
+        loadStudentLeaves()
     }
 
     private fun loadDashboard() {
@@ -102,6 +110,55 @@ class DashboardViewModel : ViewModel() {
             repository.getStaffList()
                 .catch { e -> _staffList.value = UiState.Error(e.message ?: "Error") }
                 .collect { _staffList.value = UiState.Success(it) }
+        }
+    }
+
+    private fun loadStudentList() {
+        viewModelScope.launch {
+            _studentList.value = UiState.Loading
+            repository.getStudentList()
+                .catch { e -> _studentList.value = UiState.Error(e.message ?: "Error") }
+                .collect { _studentList.value = UiState.Success(it) }
+        }
+    }
+
+    private fun loadStaffLeaves() {
+        viewModelScope.launch {
+            _staffLeaves.value = UiState.Loading
+            repository.getStaffLeaves()
+                .catch { e -> _staffLeaves.value = UiState.Error(e.message ?: "Error") }
+                .collect { _staffLeaves.value = UiState.Success(it) }
+        }
+    }
+
+    private fun loadStudentLeaves() {
+        viewModelScope.launch {
+            _studentLeaves.value = UiState.Loading
+            repository.getStudentLeaves()
+                .catch { e -> _studentLeaves.value = UiState.Error(e.message ?: "Error") }
+                .collect { _studentLeaves.value = UiState.Success(it) }
+        }
+    }
+
+    fun handleStaffLeaveStatus(id: Int, status: String) {
+        viewModelScope.launch {
+            try {
+                repository.updateStaffLeaveStatus(id, status)
+                loadStaffLeaves() // Refresh list
+            } catch (e: Exception) {
+                // Log error or show toast in a real app
+            }
+        }
+    }
+
+    fun handleStudentLeaveStatus(id: Int, status: String) {
+        viewModelScope.launch {
+            try {
+                repository.updateStudentLeaveStatus(id, status)
+                loadStudentLeaves() // Refresh list
+            } catch (e: Exception) {
+                // Log error
+            }
         }
     }
 

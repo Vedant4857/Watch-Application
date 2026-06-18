@@ -137,11 +137,11 @@ class SchoolDataSeeder extends Seeder
         }
 
         $admissions = [
-            ['student_name' => 'Tanisha Bose', 'class_name' => 'Grade 6-A', 'admission_number' => 'ADM-2026-1089', 'parent_name' => 'Mr. Subroto Bose', 'admission_time' => '8:45 AM'],
-            ['student_name' => 'Kiran Reddy', 'class_name' => 'Grade 4-B', 'admission_number' => 'ADM-2026-1090', 'parent_name' => 'Mrs. Lakshmi Reddy', 'admission_time' => '9:30 AM'],
-            ['student_name' => 'Arjun Mishra', 'class_name' => 'Grade 9-A', 'admission_number' => 'ADM-2026-1091', 'parent_name' => 'Mr. Arun Mishra', 'admission_time' => '10:20 AM'],
-            ['student_name' => 'Diya Malhotra', 'class_name' => 'Grade 2-A', 'admission_number' => 'ADM-2026-1092', 'parent_name' => 'Mrs. Rekha Malhotra', 'admission_time' => '11:10 AM'],
-            ['student_name' => 'Siddharth Roy', 'class_name' => 'Grade 11-B', 'admission_number' => 'ADM-2026-1093', 'parent_name' => 'Mr. Bijoy Roy', 'admission_time' => '12:05 PM'],
+            ['student_name' => 'Tanisha Bose', 'class_name' => 'Grade 6-A', 'enrollment_no' => 'ADM-2026-1089', 'parent_name' => 'Mr. Subroto Bose', 'admission_time' => '8:45 AM'],
+            ['student_name' => 'Kiran Reddy', 'class_name' => 'Grade 4-B', 'enrollment_no' => 'ADM-2026-1090', 'parent_name' => 'Mrs. Lakshmi Reddy', 'admission_time' => '9:30 AM'],
+            ['student_name' => 'Arjun Mishra', 'class_name' => 'Grade 9-A', 'enrollment_no' => 'ADM-2026-1091', 'parent_name' => 'Mr. Arun Mishra', 'admission_time' => '10:20 AM'],
+            ['student_name' => 'Diya Malhotra', 'class_name' => 'Grade 2-A', 'enrollment_no' => 'ADM-2026-1092', 'parent_name' => 'Mrs. Rekha Malhotra', 'admission_time' => '11:10 AM'],
+            ['student_name' => 'Siddharth Roy', 'class_name' => 'Grade 11-B', 'enrollment_no' => 'ADM-2026-1093', 'parent_name' => 'Mr. Bijoy Roy', 'admission_time' => '12:05 PM'],
         ];
 
         foreach ($admissions as $admission) {
@@ -149,7 +149,7 @@ class SchoolDataSeeder extends Seeder
                 'school_id' => 1,
                 'student_name' => $admission['student_name'],
                 'class_name' => $admission['class_name'],
-                'admission_number' => $admission['admission_number'],
+                'enrollment_no' => $admission['enrollment_no'],
                 'parent_name' => $admission['parent_name'],
                 'admission_date' => $today,
                 'admission_time' => $admission['admission_time'],

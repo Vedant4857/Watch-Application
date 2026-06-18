@@ -25,6 +25,8 @@ val grey = Color(0xFF202124)
 
 val MoneyGreen = Color(0xFF4CAF50)
 
+val LeaveOrange = Color(0xFFFF9800)
+
 // Semantic colors
 val AttendanceGreen = TealGreen
 //val AbsentRed       = CoralRed

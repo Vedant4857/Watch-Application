@@ -23,9 +23,9 @@
     </p>
 
     <p>
-        Admission Number
+        Enrollment No.
         <br>
-        <input type="text" name="admission_number">
+        <input type="text" name="enrollment_no">
     </p>
 
     <p>

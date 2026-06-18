@@ -88,10 +88,37 @@ CREATE TABLE IF NOT EXISTS admissions (
     school_id BIGINT UNSIGNED NOT NULL,
     student_name VARCHAR(255) NOT NULL,
     class_name VARCHAR(64) NOT NULL,
-    admission_number VARCHAR(64) NOT NULL,
+    enrollment_no VARCHAR(64) NOT NULL,
     parent_name VARCHAR(255) NOT NULL,
     admission_date DATE NOT NULL,
     admission_time VARCHAR(32) NOT NULL,
+    created_at TIMESTAMP NULL,
+    updated_at TIMESTAMP NULL,
+    FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS staff_leaves (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    school_id BIGINT UNSIGNED NOT NULL,
+    staff_name VARCHAR(255) NOT NULL,
+    leave_date DATE NOT NULL,
+    leave_type VARCHAR(64) NOT NULL,
+    reason TEXT NOT NULL,
+    status VARCHAR(32) DEFAULT 'pending',
+    created_at TIMESTAMP NULL,
+    updated_at TIMESTAMP NULL,
+    FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS student_leaves (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    school_id BIGINT UNSIGNED NOT NULL,
+    student_name VARCHAR(255) NOT NULL,
+    class_name VARCHAR(64) NOT NULL,
+    leave_date DATE NOT NULL,
+    leave_type VARCHAR(64) NOT NULL,
+    reason TEXT NOT NULL,
+    status VARCHAR(32) DEFAULT 'pending',
     created_at TIMESTAMP NULL,
     updated_at TIMESTAMP NULL,
     FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE CASCADE
@@ -210,7 +237,7 @@ INSERT INTO fee_transactions (school_id, student_name, class_name, amount, fee_t
 (1, 'Anvi Nair',     'Grade 1-B',   5000.00,  'Tuition',   CURDATE(), '1:20 PM',  NOW(), NOW());
 
 -- Step 10: Today's new admissions
-INSERT INTO admissions (school_id, student_name, class_name, admission_number, parent_name, admission_date, admission_time, created_at, updated_at) VALUES
+INSERT INTO admissions (school_id, student_name, class_name, enrollment_no, parent_name, admission_date, admission_time, created_at, updated_at) VALUES
 (1, 'Tanisha Bose',    'Grade 6-A',  'ADM-2026-1089', 'Mr. Subroto Bose',    CURDATE(), '8:45 AM',  NOW(), NOW()),
 (1, 'Kiran Reddy',     'Grade 4-B',  'ADM-2026-1090', 'Mrs. Lakshmi Reddy',  CURDATE(), '9:30 AM',  NOW(), NOW()),
 (1, 'Arjun Mishra',    'Grade 9-A',  'ADM-2026-1091', 'Mr. Arun Mishra',     CURDATE(), '10:20 AM', NOW(), NOW()),
@@ -237,7 +264,7 @@ INSERT INTO admissions (school_id, student_name, class_name, admission_number, p
 -- VALUES (1, 'Student Name', 'Grade 5-A', 5000.00, 'Tuition', CURDATE(), '10:00 AM', NOW(), NOW());
 
 -- Add a new admission today
--- INSERT INTO admissions (school_id, student_name, class_name, admission_number, parent_name, admission_date, admission_time, created_at, updated_at)
+-- INSERT INTO admissions (school_id, student_name, class_name, enrollment_no, parent_name, admission_date, admission_time, created_at, updated_at)
 -- VALUES (1, 'New Student', 'Grade 3-A', 'ADM-2026-1100', 'Parent Name', CURDATE(), '9:00 AM', NOW(), NOW());
 
 -- View dashboard summary for today

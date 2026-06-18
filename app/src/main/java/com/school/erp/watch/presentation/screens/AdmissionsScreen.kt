@@ -125,7 +125,7 @@ fun AdmissionCard(record: AdmissionRecord, number: Int) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(20.dp))
             .background(grey)
             .padding(10.dp)
     ) {
@@ -176,9 +176,9 @@ fun AdmissionCard(record: AdmissionRecord, number: Int) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column {
-                Text(text = "Admission No.", color = MutedGray, fontSize = 8.sp)
+                Text(text = "Enrollment No.", color = MutedGray, fontSize = 8.sp)
                 Text(
-                    text = record.admissionNumber,
+                    text = record.enrollmentNo,
                     color = CyanAccent,
                     fontSize = 9.sp,
                     fontWeight = FontWeight.SemiBold

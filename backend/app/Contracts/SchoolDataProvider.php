@@ -50,4 +50,12 @@ interface SchoolDataProvider
      * @return list<array{studentName: string, className: string, admissionNumber: string, time: string, parentName: string}>
      */
     public function getAdmissions(?string $date = null): array;
+
+    public function getStaffLeaves(): array;
+
+    public function getStudentLeaves(): array;
+
+    public function updateStaffLeaveStatus(int $id, string $status): void;
+
+    public function updateStudentLeaveStatus(int $id, string $status): void;
 }

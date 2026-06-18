@@ -86,7 +86,7 @@ return new class extends Migration
                 $table->foreignId('school_id')->constrained()->cascadeOnDelete();
                 $table->string('student_name');
                 $table->string('class_name', 64);
-                $table->string('admission_number', 64);
+                $table->string('enrollment_no', 64);
                 $table->string('parent_name');
                 $table->date('admission_date');
                 $table->string('admission_time', 32);

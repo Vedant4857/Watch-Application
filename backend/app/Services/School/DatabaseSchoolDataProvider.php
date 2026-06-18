@@ -3,6 +3,12 @@
 namespace App\Services\School;
 
 use App\Contracts\SchoolDataProvider;
+use App\Models\FeeTransaction;
+use App\Models\School;
+use App\Models\Staff;
+use App\Models\Student;
+use App\Models\StaffLeave;
+use App\Models\StudentLeave;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -193,7 +199,7 @@ class DatabaseSchoolDataProvider implements SchoolDataProvider
             ->map(fn ($row) => [
                 'studentName' => $row->student_name,
                 'className' => $row->class_name,
-                'admissionNumber' => $row->admission_number,
+                'enrollmentNo' => $row->enrollment_no,
                 'time' => $row->admission_time,
                 'parentName' => $row->parent_name,
             ])
@@ -224,5 +230,66 @@ class DatabaseSchoolDataProvider implements SchoolDataProvider
             : Carbon::now(config('school.timezone'));
 
         return $carbon->format('d M Y');
+    }
+
+    public function getStaffLeaves(): array
+    {
+        $schoolId = (int) config('school.school_id');
+        $today = Carbon::today(config('school.timezone'))->toDateString();
+        return StaffLeave::where('school_id', $schoolId)
+            ->where(function($query) use ($today) {
+                $query->where('status', 'pending')
+                      ->orWhere('leave_date', '>=', $today);
+            })
+            ->orderByDesc('id')
+            ->get()
+            ->map(fn($leave) => [
+                'id' => $leave->id,
+                'staffName' => $leave->staff_name,
+                'leaveDate' => Carbon::parse($leave->leave_date)->format('Y-m-d'),
+                'leaveType' => $leave->leave_type,
+                'reason' => $leave->reason,
+                'status' => $leave->status,
+            ])
+            ->toArray();
+    }
+
+    public function getStudentLeaves(): array
+    {
+        $schoolId = (int) config('school.school_id');
+        $today = Carbon::today(config('school.timezone'))->toDateString();
+        return StudentLeave::where('school_id', $schoolId)
+            ->where(function($query) use ($today) {
+                $query->where('status', 'pending')
+                      ->orWhere('leave_date', '>=', $today);
+            })
+            ->orderByDesc('id')
+            ->get()
+            ->map(fn($leave) => [
+                'id' => $leave->id,
+                'studentName' => $leave->student_name,
+                'className' => $leave->class_name,
+                'leaveDate' => Carbon::parse($leave->leave_date)->format('Y-m-d'),
+                'leaveType' => $leave->leave_type,
+                'reason' => $leave->reason,
+                'status' => $leave->status,
+            ])
+            ->toArray();
+    }
+
+    public function updateStaffLeaveStatus(int $id, string $status): void
+    {
+        $schoolId = (int) config('school.school_id');
+        StaffLeave::where('school_id', $schoolId)
+            ->where('id', $id)
+            ->update(['status' => $status]);
+    }
+
+    public function updateStudentLeaveStatus(int $id, string $status): void
+    {
+        $schoolId = (int) config('school.school_id');
+        StudentLeave::where('school_id', $schoolId)
+            ->where('id', $id)
+            ->update(['status' => $status]);
     }
 }

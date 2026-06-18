@@ -34,4 +34,24 @@ class SchoolDataService
     {
         return $this->provider->getAdmissions($date);
     }
+
+    public function getStaffLeaves(): array
+    {
+        return $this->provider->getStaffLeaves();
+    }
+
+    public function getStudentLeaves(): array
+    {
+        return $this->provider->getStudentLeaves();
+    }
+
+    public function updateStaffLeaveStatus(int $id, string $status): void
+    {
+        $this->provider->updateStaffLeaveStatus($id, $status);
+    }
+
+    public function updateStudentLeaveStatus(int $id, string $status): void
+    {
+        $this->provider->updateStudentLeaveStatus($id, $status);
+    }
 }

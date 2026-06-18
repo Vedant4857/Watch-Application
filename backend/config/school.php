@@ -71,7 +71,7 @@ return [
             'admission' => [
                 'student_name' => 'student_name',
                 'class_name' => 'class_name',
-                'admission_number' => 'admission_number',
+                'enrollment_no' => 'enrollment_no',
                 'time' => 'time',
                 'parent_name' => 'parent_name',
             ],

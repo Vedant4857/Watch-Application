@@ -24,7 +24,7 @@ class DemoAdmissionController extends Controller
             'school_id' => 1,
             'student_name' => $request->student_name,
             'class_name' => $request->class_name,
-            'admission_number' => $request->admission_number,
+            'enrollment_no' => $request->enrollment_no,
             'parent_name' => $request->parent_name,
             'admission_date' => now()->toDateString(),
             'admission_time' => now()->format('H:i:s'),

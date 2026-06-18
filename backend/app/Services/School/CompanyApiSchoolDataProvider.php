@@ -213,7 +213,7 @@ class CompanyApiSchoolDataProvider implements SchoolDataProvider
         return [
             'studentName' => (string) ($item[$map['student_name']] ?? $item['studentName'] ?? $item['student_name'] ?? ''),
             'className' => (string) ($item[$map['class_name']] ?? $item['className'] ?? $item['class_name'] ?? ''),
-            'admissionNumber' => (string) ($item[$map['admission_number']] ?? $item['admissionNumber'] ?? $item['admission_number'] ?? ''),
+            'enrollmentNo' => (string) ($item[$map['enrollment_no']] ?? $item['enrollmentNo'] ?? $item['enrollment_no'] ?? ''),
             'time' => (string) ($item[$map['time']] ?? $item['time'] ?? $item['enrolled_at'] ?? ''),
             'parentName' => (string) ($item[$map['parent_name']] ?? $item['parentName'] ?? $item['parent_name'] ?? $item['guardian_name'] ?? ''),
         ];
@@ -226,5 +226,25 @@ class CompanyApiSchoolDataProvider implements SchoolDataProvider
             : Carbon::now(config('school.timezone'));
 
         return $carbon->format('d M Y');
+    }
+
+    public function getStaffLeaves(): array
+    {
+        return [];
+    }
+
+    public function getStudentLeaves(): array
+    {
+        return [];
+    }
+
+    public function updateStaffLeaveStatus(int $id, string $status): void
+    {
+        // Sub-API implementation
+    }
+
+    public function updateStudentLeaveStatus(int $id, string $status): void
+    {
+        // Sub-API implementation
     }
 }

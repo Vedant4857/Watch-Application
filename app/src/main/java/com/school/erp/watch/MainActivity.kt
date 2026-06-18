@@ -28,6 +28,8 @@ object Routes {
     const val ADMISSIONS         = "admissions"
     const val STAFF_LIST         = "staff_list"
     const val STUDENT_LIST       = "student_list"
+    const val STAFF_LEAVES       = "staff_leaves"
+    const val STUDENT_LEAVES     = "student_leaves"
 }
 
 class MainActivity : ComponentActivity() {
@@ -41,7 +43,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        com.school.erp.watch.data.SchoolDataRepository.initDatabase(this)
         registerFcmToken()
         checkNotificationPermission()
 
@@ -62,7 +63,9 @@ class MainActivity : ComponentActivity() {
                             onNavigateToFees              = { navController.navigate(Routes.FEES) },
                             onNavigateToAdmissions        = { navController.navigate(Routes.ADMISSIONS) },
                             onNavigateToStaffList         = { navController.navigate(Routes.STAFF_LIST) },
-                            onNavigateToStudentList       = { navController.navigate(Routes.STUDENT_LIST) }
+                            onNavigateToStudentList       = { navController.navigate(Routes.STUDENT_LIST) },
+                            onNavigateToStaffLeaves       = { navController.navigate(Routes.STAFF_LEAVES) },
+                            onNavigateToStudentLeaves     = { navController.navigate(Routes.STUDENT_LEAVES) }
                         )
                     }
 
@@ -103,6 +106,20 @@ class MainActivity : ComponentActivity() {
 
                     composable(Routes.STUDENT_LIST) {
                         StudentListScreen(
+                            viewModel = viewModel,
+                            onBack = { navController.popBackStack() }
+                        )
+                    }
+
+                    composable(Routes.STAFF_LEAVES) {
+                        StaffLeavesScreen(
+                            viewModel = viewModel,
+                            onBack = { navController.popBackStack() }
+                        )
+                    }
+
+                    composable(Routes.STUDENT_LEAVES) {
+                        StudentLeavesScreen(
                             viewModel = viewModel,
                             onBack = { navController.popBackStack() }
                         )

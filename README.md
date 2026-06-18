@@ -230,6 +230,37 @@ php artisan serve
 
 The backend is configured for **your own MySQL data** by default. See **`backend/PERSONAL_SETUP.md`** for step-by-step setup and MySQL queries. For an external company API later, see **API_INTEGRATION.md**.
 
+### Adding Leaves Management Tables
+If you want to support the new leaves management feature, run these queries in your MySQL database:
+```sql
+CREATE TABLE IF NOT EXISTS staff_leaves (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    school_id BIGINT UNSIGNED NOT NULL,
+    staff_name VARCHAR(255) NOT NULL,
+    leave_date DATE NOT NULL,
+    leave_type VARCHAR(64) NOT NULL,
+    reason TEXT NOT NULL,
+    status VARCHAR(32) DEFAULT 'pending',
+    created_at TIMESTAMP NULL,
+    updated_at TIMESTAMP NULL,
+    FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS student_leaves (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    school_id BIGINT UNSIGNED NOT NULL,
+    student_name VARCHAR(255) NOT NULL,
+    class_name VARCHAR(64) NOT NULL,
+    leave_date DATE NOT NULL,
+    leave_type VARCHAR(64) NOT NULL,
+    reason TEXT NOT NULL,
+    status VARCHAR(32) DEFAULT 'pending',
+    created_at TIMESTAMP NULL,
+    updated_at TIMESTAMP NULL,
+    FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE CASCADE
+);
+```
+
 ### Connect the watch app
 
 The watch app already includes API access and is pointed at:

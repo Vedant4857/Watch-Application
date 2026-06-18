@@ -101,7 +101,9 @@ fun DashboardScreen(
     onNavigateToFees: () -> Unit,
     onNavigateToAdmissions: () -> Unit,
     onNavigateToStaffList: () -> Unit,
-    onNavigateToStudentList: () -> Unit
+    onNavigateToStudentList: () -> Unit,
+    onNavigateToStaffLeaves: () -> Unit,
+    onNavigateToStudentLeaves: () -> Unit
 ) {
     // Fetch fresh data every time this screen enters the composition.
     LaunchedEffect(Unit) {
@@ -110,6 +112,11 @@ fun DashboardScreen(
 
     // Collect the StateFlow as Compose state, respecting the lifecycle.
     val statsState by viewModel.dashboardStats.collectAsStateWithLifecycle()
+    val staffLeavesState by viewModel.staffLeaves.collectAsStateWithLifecycle()
+    val studentLeavesState by viewModel.studentLeaves.collectAsStateWithLifecycle()
+
+    val pendingStaffLeaves = (staffLeavesState as? UiState.Success)?.data?.count { it.status == "pending" } ?: 0
+    val pendingStudentLeaves = (studentLeavesState as? UiState.Success)?.data?.count { it.status == "pending" } ?: 0
 
     // Route to the correct screen based on the current data-loading state.
     when (val state = statsState) {
@@ -131,12 +138,16 @@ fun DashboardScreen(
             // Data is ready — render the full dashboard.
             DashboardContent(
                 stats                         = state.data,
+                pendingStaffLeaves            = pendingStaffLeaves,
+                pendingStudentLeaves          = pendingStudentLeaves,
                 onNavigateToStaffAttendance   = onNavigateToStaffAttendance,
                 onNavigateToStudentAttendance = onNavigateToStudentAttendance,
                 onNavigateToFees              = onNavigateToFees,
                 onNavigateToAdmissions        = onNavigateToAdmissions,
                 onNavigateToStaffList         = onNavigateToStaffList,
-                onNavigateToStudentList       = onNavigateToStudentList
+                onNavigateToStudentList       = onNavigateToStudentList,
+                onNavigateToStaffLeaves       = onNavigateToStaffLeaves,
+                onNavigateToStudentLeaves     = onNavigateToStudentLeaves
             )
         }
     }
@@ -165,12 +176,16 @@ fun DashboardScreen(
 @Composable
 private fun DashboardContent(
     stats: DashboardStats,
+    pendingStaffLeaves: Int,
+    pendingStudentLeaves: Int,
     onNavigateToStaffAttendance: () -> Unit,
     onNavigateToStudentAttendance: () -> Unit,
     onNavigateToFees: () -> Unit,
     onNavigateToAdmissions: () -> Unit,
     onNavigateToStaffList: () -> Unit,
-    onNavigateToStudentList: () -> Unit
+    onNavigateToStudentList: () -> Unit,
+    onNavigateToStaffLeaves: () -> Unit,
+    onNavigateToStudentLeaves: () -> Unit
 ) {
     // Hoisted scroll state so the Scaffold's PositionIndicator can read it.
     val scalingLazyListState = rememberScalingLazyListState()
@@ -301,7 +316,33 @@ private fun DashboardContent(
             // ── 6. Staff Directory ────────────────────────────────────────────
 
 
-            // ── 8. Footer hint ───────────────────────────────────────────────
+            // ── 8. Staff Leaves ───────────────────────────────────────────────
+            item {
+                MetricCard(
+                    icon        = "🌴",
+                    label       = "Staff Leaves",
+                    value       = if (pendingStaffLeaves > 0) "$pendingStaffLeaves Pending" else "No Pending",
+                    subValue    = "Review & Approve",
+                    accentColor = LeaveOrange,
+                    percentage  = null,
+                    onClick     = onNavigateToStaffLeaves
+                )
+            }
+
+            // ── 9. Student Leaves ─────────────────────────────────────────────
+            item {
+                MetricCard(
+                    icon        = "📝",
+                    label       = "Student Leaves",
+                    value       = if (pendingStudentLeaves > 0) "$pendingStudentLeaves Pending" else "No Pending",
+                    subValue    = "Review & Approve",
+                    accentColor = LeaveOrange,
+                    percentage  = null,
+                    onClick     = onNavigateToStudentLeaves
+                )
+            }
+
+            // ── 10. Footer hint ───────────────────────────────────────────────
             item {
                 Text(
                     text      = "Tap specific card for details",

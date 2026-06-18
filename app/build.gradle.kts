@@ -2,7 +2,6 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.google.services)
-    alias(libs.plugins.ksp)
 }
 
 android {
@@ -50,6 +49,7 @@ dependencies {
     implementation(composeBom)
 
     implementation(libs.firebase.messaging)
+    implementation(libs.coil.compose)
 
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -66,16 +66,6 @@ dependencies {
 
     // Coroutines
     implementation(libs.kotlinx.coroutines.android)
-
-    // Room
-    implementation(libs.room.runtime)
-    implementation(libs.room.ktx)
-    implementation(libs.room.paging)
-    ksp(libs.room.compiler)
-
-    // Paging
-    implementation(libs.paging.runtime)
-    implementation(libs.paging.compose)
 
     // Tooling
     debugImplementation(libs.wear.compose.ui.tooling)
